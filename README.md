@@ -5,18 +5,23 @@ Inspired by https://github.com/logsol/Github-Auto-Deploy
 
 Ol Githook is a simple server you can run on your remote server that will receive Git POST hooks from Github/Bitbucket and automatically update your repositories, optionally executing scripts.
 
+## What it does
+
 - Tracks any repos you've listed in `~/captain-githook/config.edn`
 - Clones repos into `~/captain-githook/{provider}/{repo-name}`
 - Listens for Git POST hooks
 - Syncs repos with `git pull origin` when notified by Github/Bitbucket
 - (Optional) Runs `~/captain-githook/{provider}/{repo-name}/githook-deploy` if provided after any time it receives an update for that repo.
 
-    Captain Githook is preparing to set sail.
-    ---> Checking /home/danneu/captain-githook... Exists
-    ---> Checking /home/danneu/captain-githook/config.edn... Exists
-         - Found 1 repo(s)
-    ---> Syncing ssh://git@bitbucket.org/danneu/captain-githook.git...
-    Cloning into 'captain-githook'... Done.
+
+```
+Captain Githook is preparing to set sail.
+---> Checking /home/danneu/captain-githook... Exists
+---> Checking /home/danneu/captain-githook/config.edn... Exists
+     - Found 1 repo(s)
+---> Syncing ssh://git@bitbucket.org/danneu/captain-githook.git...
+Cloning into 'captain-githook'... Done.
+```
 
 ## Install & Launch
 
