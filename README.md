@@ -51,7 +51,7 @@ Captain Githook is preparing to set sail.
     └── config.edn/
 ```
 
-- Add `http://your.website.com:<PORT>` as a POST hook to Bitbucket and Github.
+- Add `http://your.server:<PORT>` as a POST hook to Bitbucket and Github.
 - Bitbucket and Github will now notify the captain whenever you update a repository.
 - When the captain receives a notification, he runs `git pull origin` for the appropriate repository.
 - (Optional) He then runs `~/captain-githook/{provider}/{repository}/githook-deploy` which can contain arbitrary shell commands. (Unimplemented)
