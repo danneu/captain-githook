@@ -5,23 +5,56 @@ Inspired by https://github.com/logsol/Github-Auto-Deploy
 
 Ol Githook is a simple server you can run on your remote server that will receive Git POST hooks from Github/Bitbucket and automatically update your repositories, optionally executing scripts.
 
-## What it does
+## Usage
 
-- Tracks any repos you've listed in `~/captain-githook/config.edn`
-- Clones repos into `~/captain-githook/{provider}/{repo-name}`
-- Listens for Git POST hooks
-- Syncs repos with `git pull origin` when notified by Github/Bitbucket
-- (Optional) Runs `~/captain-githook/{provider}/{repo-name}/githook-deploy` if provided after any time it receives an update for that repo.
-
+- Create a `~/captain-githook` directory.
 
 ```
+~/
+└── captain-githook/
+    └── config.edn
+```
+
+- List your repositories in `~/captain-githook/config.edn`: (Only Bitbucket is tested so far)
+
+``` clojure
+{:repos [{:url "git@bitbucket.org:danneu/klobb.git"}
+         {:url "git@github.com:danneu/darkstrap.git"}]}
+```
+
+- Launch the captain out to sea:
+
+```
+$ java -jar captain-githook.jar <PORT>
+
 Captain Githook is preparing to set sail.
 ---> Checking /home/danneu/captain-githook... Exists
 ---> Checking /home/danneu/captain-githook/config.edn... Exists
-     - Found 1 repo(s)
----> Syncing ssh://git@bitbucket.org/danneu/captain-githook.git...
-Cloning into 'captain-githook'... Done.
+     - Found 2 repo(s)
+---> Syncing ssh://git@bitbucket.org/danneu/klobb.git...
+     Cloning into 'klobb'... Done.
+---> Syncing ssh://git@github.com/danneu/darkstrap.git...
+     Cloning into 'darkstrap'... Done.
 ```
+
+- The captain will clone your repositories if they haven't yet been cloned.
+
+```
+~/
+└── captain-githook/
+    ├── bitbucket/
+    │   └── darkstrap/
+    │       └── ...
+    ├── github/
+    │   └── klobb/
+    │       └── ...
+    └── config.edn/
+```
+
+- Add `http://your.website.com:<PORT>` as a POST hook to Bitbucket and Github.
+- Bitbucket and Github will now notify the captain whenever you update a repository.
+- When the captain receives a notification, he runs `git pull origin` for the appropriate repository.
+- (Optional) He then runs `~/captain-githook/{provider}/{repository}/githook-deploy` which can contain arbitrary shell commands. (Unimplemented)
 
 ## Install & Launch
 
@@ -33,9 +66,9 @@ You can now direct POST hooks to `http://example.com:PORT`.
 
 The captain awaits.
     
-## Usage
+## Misc details
 
-### `~/captain-githook`
+### ~/captain-githook
 
 Whenever captain-githook is launched, he creates his mighty vessel of the sea (a directory) if it doesn't exist:
 
@@ -43,7 +76,7 @@ Whenever captain-githook is launched, he creates his mighty vessel of the sea (a
     
 This is where the good captain keeps your repositories.
 
-### `~/captain-githook/config.edn`
+### ~/captain-githook/config.edn
 
 The captain doesn't have anything to do unless you provide at least one repository url in `~/captain-githook/config.edn`.
 
@@ -53,8 +86,6 @@ For example:
 {:repos [{:url "git@bitbucket.org:danneu/klobb.git"}
          {:url "git@github.com:danneu/darkstrap.git"}]}
 ```
-
-(Only tested it with Bitbucket so far)
 
 Given the above config, once captain-githook is launched, he will create this directory structure, cloning the repos if it hasn't yet:
 
