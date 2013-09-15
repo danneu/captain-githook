@@ -50,7 +50,7 @@ Captain Githook is preparing to set sail.
     │   └── danneu/
     │       └── darkstrap/
     │           └── ...
-    └── config.edn/
+    └── config.edn
 ```
 
 - Add `http://your.server:<PORT>` as a POST hook to Bitbucket and Github.
