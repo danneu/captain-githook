@@ -5,6 +5,8 @@ Inspired by https://github.com/logsol/Github-Auto-Deploy
 
 Ol Githook is a simple server you can run on your remote server that will receive Git POST hooks from Github/Bitbucket and automatically update your repositories, optionally executing scripts.
 
+![Screenshot](http://i.imgur.com/hWvHAdI.png)
+
 ## Usage
 
 - Create a `~/captain-githook` directory.
@@ -56,7 +58,7 @@ Captain Githook is preparing to set sail.
 - Add `http://your.server:<PORT>` as a POST hook to Bitbucket and Github.
 - Bitbucket and Github will now notify the captain whenever you update a repository.
 - When the captain receives a notification, he runs `git pull origin` for the appropriate repository.
-- (Optional) He then runs `~/captain-githook/{provider}/{owner}/{repository}/githook-deploy` which can contain arbitrary shell commands. (Unimplemented)
+- (Optional) He then runs `make autodeploy` which can contain arbitrary shell commands.
 
 ## Purpose
 
@@ -124,11 +126,24 @@ Whenever captain-githook receives a POST hook, he will first ensure that it's co
 
 If a matching repo exists, he will run `git pull` from the repo directory and then execute the repo's `githook-deploy` script.
 
-## githook-deploy script
+## make autodeploy
 
-You can commit an optional `githook-deploy` file to any repository that captain-githook will run for each repository:
+captain-githook runs `make autodeploy` in the root of a repository any time that repository is updated.
 
-- After he starts (all repositories)
-- After he receives a POST hook (one repository)
+In other words, `make autodeploy` is run:
+
+- For each repository whenever captain-githook starts.
+- After captain-githook pulls in a repository's updates.
+
+In case you're unfamiliar, `make autodeploy` is running the "autodeploy" task that you will specify in a file named Makefile in the root of your repo.
+
+Here's a sample Makefile:
+
+```
+autodeploy:
+  echo "I'm re-deploying myself!"
+```
 
 The primary use-case for this script is to restart web processes to ensure they pick up the latest changes.
+
+Since `make autodeploy` is run every time captain-githook is notified that a repo is updated, you want to ensure that autodeploy will shut down the previously deployed processes.

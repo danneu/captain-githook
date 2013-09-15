@@ -1,6 +1,5 @@
 (ns captain-githook.util
-  (:require [schema.core :as s]
-            [clojure.data.json :as json]
+  (:require [clojure.data.json :as json]
             [clojure.string :as str])
   (:import [java.io File]))
 

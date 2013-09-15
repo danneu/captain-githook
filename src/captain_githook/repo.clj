@@ -104,7 +104,9 @@
   [repo]
   (util/captain-path (:provider repo) (:owner repo) (:name repo)))
 
-;; Git ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Shell ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; These return {:exit _, :out _, :in _}
 
 (defn git-clone [repo]
   (shell/with-sh-dir (owner-path repo)
@@ -116,11 +118,13 @@
 
 (defn sync-repo
   "If dir exists at repo path, then just git-pull.
-   If dir doesn't exist, then git-clone.
-   Returns {:status _, :out _, :err _, ...}"
+   If dir doesn't exist, then git-clone."
   [repo]
   (if (.exists (File. (repo-path repo)))
     (git-pull repo)
-    (do
-      (util/mkdir-p (owner-path repo))
-      (git-clone repo))))
+    (do (util/mkdir-p (owner-path repo))
+        (git-clone repo))))
+
+(defn autodeploy [repo]
+  (shell/with-sh-dir (repo-path repo)
+    (shell/sh "make" "githook-autodeploy")))
