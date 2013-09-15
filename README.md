@@ -15,11 +15,11 @@ Ol Githook is a simple server you can run on your remote server that will receiv
     └── config.edn
 ```
 
-- List your repositories in `~/captain-githook/config.edn`: (Only Bitbucket is tested so far)
+- List your repositories in `~/captain-githook/config.edn`:
 
 ``` clojure
 {:repos [{:url "git@bitbucket.org:danneu/klobb.git"}
-         {:url "git@github.com:danneu/darkstrap.git"}]}
+         {:url "https://github.com:danneu/darkstrap.git"}]}
 ```
 
 - Launch the captain out to sea:
@@ -33,7 +33,7 @@ Captain Githook is preparing to set sail.
      - Found 2 repo(s)
 ---> Syncing ssh://git@bitbucket.org/danneu/klobb.git...
      Cloning into 'klobb'... Done.
----> Syncing ssh://git@github.com/danneu/darkstrap.git...
+---> Syncing https://github.com/danneu/darkstrap.git...
      Cloning into 'darkstrap'... Done.
 ```
 
@@ -43,29 +43,40 @@ Captain Githook is preparing to set sail.
 ~/
 └── captain-githook/
     ├── bitbucket/
-    │   └── darkstrap/
-    │       └── ...
+    │   └── danneu/
+    │       └── klobb/
+    │           └── ...
     ├── github/
-    │   └── klobb/
-    │       └── ...
+    │   └── danneu/
+    │       └── darkstrap/
+    │           └── ...
     └── config.edn/
 ```
 
 - Add `http://your.server:<PORT>` as a POST hook to Bitbucket and Github.
 - Bitbucket and Github will now notify the captain whenever you update a repository.
 - When the captain receives a notification, he runs `git pull origin` for the appropriate repository.
-- (Optional) He then runs `~/captain-githook/{provider}/{repository}/githook-deploy` which can contain arbitrary shell commands. (Unimplemented)
+- (Optional) He then runs `~/captain-githook/{provider}/{owner}/{repository}/githook-deploy` which can contain arbitrary shell commands. (Unimplemented)
+
+## Purpose
+
+I'm new to running my own VPS and so far have been manually rsyncing up my changes to the multiple apps that I have running on it. It's tedious and I'm ready to graduate to a better workflow.
+
+I wanted an automated, simple solution for my modest needs.
+
+I found https://github.com/logsol/Github-Auto-Deploy after a google search and decided to implement the idea myself.
 
 ## Install & Launch
 
-    $ git clone ...
+    $ git clone https://github.com/danneu/captain-github
+    $ git 
     $ lein uberjar
     $ java -jar target/captain-githook.jar <PORT>
     
-You can now direct POST hooks to `http://example.com:PORT`. 
+You can now direct POST hooks to `http://your.server:<PORT>`. 
 
 The captain awaits.
-    
+
 ## Misc details
 
 ### ~/captain-githook
@@ -92,9 +103,11 @@ Given the above config, once captain-githook is launched, he will create this di
     ~/
       - captain-githook/
         - bitbucket/
-          - klobb/
+          - danneu/
+            - klobb/
         - github/
-          - darkstrap/
+          - danneu/
+            - darkstrap/
         
 For each repo, he will:
 
@@ -119,9 +132,3 @@ You can commit an optional `githook-deploy` file to any repository that captain-
 - After he receives a POST hook (one repository)
 
 The primary use-case for this script is to restart web processes to ensure they pick up the latest changes.
-
-## Disclaimer
-
-I wrote this at 4am.
-
-I have poor sysadmin skills. To put things in perspect, this project is 1000x better than what I was doing before.

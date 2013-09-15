@@ -16,12 +16,25 @@
 ;; Routes ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defroutes app-routes
-  (POST "/" {{payload :payload} :params}
-    (when-let [repo (repo/payload->configured-repo payload)]
-      (println (str "---> Pulling " (:url repo) "... "))
-      (let [{:keys [out err]} (repo/sync-repo repo)]
-        (print out err))
-      (println "Done.")))
+  (POST "/" {{payload-string :payload} :params}
+    (let [payload (util/parse-json payload-string)]
+      (if-let [repo (repo/payload->repo payload)]
+        ;; Payload could be parsed
+        (if-let [config-repo (repo/repo->config-repo repo)]
+          ;; Repo listed in config.edn
+          (do
+            (println (str "---> Pulling " (:url config-repo) "... "))
+            (let [{out :out err :err} (repo/sync-repo config-repo)]
+              (print out err))
+            (println "Done."))
+          ;; Repo NOT listed in config.edn
+          (do
+            (println "Repo not listed in config.edn:")
+            (clojure.pprint/pprint repo)))
+        ;; Payload couldn't be parsed.
+        (do
+          (println "Could not parse this payload:")
+          (clojure.pprint/pprint payload)))))
   (route/not-found "Not Found"))
 
 (def app
@@ -54,18 +67,18 @@
       (print (str "---> Checking " path "... "))
       (if (.exists (File. path))
         (do (println "Exists")
-            (println (str "     - Found "
-                          (count (repo/configured-repos))
-                          " repo(s)")))
+            (println (str "     - Repos found: "
+                          (count (repo/config-repos))))
+            (doseq [repo (repo/config-repos)]
+              (println (str "       " (:url repo)))))
         (do (println "Not found")
             (System/exit 0))))
 
     ;; Sync each repo
-    (doseq [repo (repo/configured-repos)]
+    (doseq [repo (repo/config-repos)]
       (println (str "---> Syncing " (:url repo) "... "))
       (let [{:keys [out err]} (repo/sync-repo repo)]
         (print out err))
       (println "Done."))
     
     (start-server port)))
-
